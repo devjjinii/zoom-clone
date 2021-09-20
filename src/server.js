@@ -21,4 +21,21 @@ const handleListen = () => console.log(`http://localhost:3000`);
 const server = http.createServer(app); // http server 생성
 const wss = new WebSocket.Server({server}); // Ws server 생성 (http 서버 전달 )
 
+function onSocketClose() {
+    console.log("Disconnected from Browser XX");
+}
+
+function onSocketMessage(message) {
+    console.log(message.toString('utf8'));
+}
+
+// websocket을 이용해 새로운 connection 을 기다림
+wss.on("connection", (socket) => {
+    // console.log(socket);
+    console.log("Connected to Browser ~");
+    socket.on("close", onSocketClose); 
+    socket.on("message", onSocketMessage);
+    socket.send("hello!!!");
+});
+
 server.listen(3000, handleListen);
