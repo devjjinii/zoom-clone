@@ -38,6 +38,7 @@ wss.on("connection", (socket) => {
     console.log("Connected to Browser ~");
     socket.on("close", onSocketClose); 
     socket.on("message", (message) => {
+        // 메세지를 구분하여야 함. (message type)
         sockets.forEach(aSocket => aSocket.send(message.toString('utf8')))
     });
 });
