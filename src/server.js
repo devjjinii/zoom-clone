@@ -34,12 +34,22 @@ const sockets = [];
 // websocket을 이용해 새로운 connection 을 기다림
 wss.on("connection", (socket) => {
     sockets.push(socket);
+    socket["nickname"] = "Anon";
     // console.log(socket);
     console.log("Connected to Browser ~");
     socket.on("close", onSocketClose); 
-    socket.on("message", (message) => {
-        // 메세지를 구분하여야 함. (message type)
-        sockets.forEach(aSocket => aSocket.send(message.toString('utf8')))
+    socket.on("message", (msg) => {  // 메세지를 구분하여야 함. (message type)
+        const message = JSON.parse(msg);
+        switch (message.type) {
+            case "new_message" :
+                sockets.forEach(aSocket => aSocket.send(`${socket.nickname}: ${message.payload}`));
+                break;
+            case "nickname" :
+                socket["nickname"] = message.payload;
+                // console.log(message.payload);
+                break;
+        }
+
     });
 });
 
