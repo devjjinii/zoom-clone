@@ -25,11 +25,20 @@ const wsServer = SocketIO(httpServer);
 
 wsServer.on("connection", socket => {
     // console.log(socket);
-    socket.on("enter_room", (msg,done) => {
-        console.log(msg);
-        setTimeout(() => {
-            done();
-        },10000)
+    socket.onAny((event) => {
+        console.log(`Socket Events: ${event}`);
+    });
+
+    socket.on("enter_room", (roomName, done) => {
+        // console.log(roomName);
+        console.log(socket.id);
+        socket.join(roomName);
+        console.log(socket.rooms);
+        done();
+
+        // setTimeout(() => {
+        //     done("hello from the backend"); // 백에서 프론트의코드를 실행 --> 보안문제, backendDone을 실행
+        // },10000);
     });
 })
 
