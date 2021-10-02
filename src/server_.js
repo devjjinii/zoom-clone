@@ -1,6 +1,5 @@
 import http from "http";
-// import WebSocket from "ws";
-import SocketIO from "socket.io";
+import WebSocket from "ws";
 import express from "express";
 
 const app = express();
@@ -19,21 +18,10 @@ const handleListen = () => console.log(`http://localhost:3000`);
 
 
 // 아래와 같이 하는 이유 : 같은 포트에 두개의 서버를 띄우기 위해
-const httpServer = http.createServer(app); // http server 생성
-// const wss = new WebSocket.Server({server}); // Ws server 생성 (http 서버 전달 )
-const wsServer = SocketIO(httpServer);
+const server = http.createServer(app); // http server 생성
+const wss = new WebSocket.Server({server}); // Ws server 생성 (http 서버 전달 )
 
-wsServer.on("connection", socket => {
-    // console.log(socket);
-    socket.on("enter_room", (msg,done) => {
-        console.log(msg);
-        setTimeout(() => {
-            done();
-        },10000)
-    });
-})
-
-/* function onSocketClose() {
+function onSocketClose() {
     console.log("Disconnected from Browser XX");
 }
 
@@ -42,6 +30,7 @@ function onSocketMessage(message) {
 }
 
 const sockets = [];
+
 // websocket을 이용해 새로운 connection 을 기다림
 wss.on("connection", (socket) => {
     sockets.push(socket);
@@ -62,6 +51,6 @@ wss.on("connection", (socket) => {
         }
 
     });
-}); */
+});
 
-httpServer.listen(3000, handleListen);
+server.listen(3000, handleListen);
