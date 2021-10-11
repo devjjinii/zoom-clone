@@ -31,46 +31,22 @@ wsServer.on("connection", socket => {
 
     socket.on("enter_room", (roomName, done) => {
         // console.log(roomName);
-        console.log(socket.id);
+        // console.log(socket.id);
+        // console.log(socket.rooms);
         socket.join(roomName);
-        console.log(socket.rooms);
         done();
-
-        // setTimeout(() => {
-        //     done("hello from the backend"); // 백에서 프론트의코드를 실행 --> 보안문제, backendDone을 실행
-        // },10000);
-    });
-})
-
-/* function onSocketClose() {
-    console.log("Disconnected from Browser XX");
-}
-
-function onSocketMessage(message) {
-    console.log(message.toString('utf8'));
-}
-
-const sockets = [];
-// websocket을 이용해 새로운 connection 을 기다림
-wss.on("connection", (socket) => {
-    sockets.push(socket);
-    socket["nickname"] = "Anon";
-    // console.log(socket);
-    console.log("Connected to Browser ~");
-    socket.on("close", onSocketClose); 
-    socket.on("message", (msg) => {  // 메세지를 구분하여야 함. (message type)
-        const message = JSON.parse(msg);
-        switch (message.type) {
-            case "new_message" :
-                sockets.forEach(aSocket => aSocket.send(`${socket.nickname}: ${message.payload}`));
-                break;
-            case "nickname" :
-                socket["nickname"] = message.payload;
-                // console.log(message.payload);
-                break;
-        }
+        socket.to(roomName).emit("welcome");
 
     });
-}); */
+
+    socket.on("disconnecting", () => {
+        socket.rooms.forEach((room) => socket.to(room).emit("bye"));
+    });
+
+    socket.on("new_message", (msg, room, done) => {
+        socket.to(room).emit("new_message", msg);
+        done(); // 프론트에서 실행
+    });
+});
 
 httpServer.listen(3000, handleListen);
