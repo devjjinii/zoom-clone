@@ -1,6 +1,7 @@
 import http from "http";
 // import WebSocket from "ws";
-import SocketIO from "socket.io";
+import { Server } from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
 import express from "express";
 
 const app = express();
@@ -21,7 +22,16 @@ const handleListen = () => console.log(`http://localhost:3000`);
 // 아래와 같이 하는 이유 : 같은 포트에 두개의 서버를 띄우기 위해
 const httpServer = http.createServer(app); // http server 생성
 // const wss = new WebSocket.Server({server}); // Ws server 생성 (http 서버 전달 )
-const wsServer = SocketIO(httpServer);
+const wsServer = new Server(httpServer, {
+    cors: {
+        origin: ["https://admin.socket.io"],
+        credentials: true,
+    },
+});
+
+instrument(wsServer, {
+    auth: false,
+});
 
 function publicRooms() {
     const {

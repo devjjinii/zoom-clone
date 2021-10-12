@@ -11,6 +11,10 @@
     * 참가자가 몇명인지, 방이 몇개인지 알 수 있음.
   * https://socket.io/docs/v4/adapter/
 
+* @socket.io/admin-ui
+  * https://admin.socket.io
+  * Connection -> Server URL -> 서버주소 입력.
+
 * 참고
   * https://socket.io
   * https://d2.naver.com/helloworld/1336
