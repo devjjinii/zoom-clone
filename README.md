@@ -6,6 +6,11 @@
 
 * /socket.io/socket.io.js
     
+* Adapter
+  * 서버간의 통신을 위해 사용.
+    * 참가자가 몇명인지, 방이 몇개인지 알 수 있음.
+  * https://socket.io/docs/v4/adapter/
+
 * 참고
   * https://socket.io
   * https://d2.naver.com/helloworld/1336

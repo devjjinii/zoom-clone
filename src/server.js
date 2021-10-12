@@ -23,10 +23,30 @@ const httpServer = http.createServer(app); // http server 생성
 // const wss = new WebSocket.Server({server}); // Ws server 생성 (http 서버 전달 )
 const wsServer = SocketIO(httpServer);
 
+function publicRooms() {
+    const {
+        sockets: {
+            adapter : { sids, rooms },
+         },
+        } = wsServer;
+    const publicRooms = [];
+    rooms.forEach((_, key) => {
+        if(sids.get(key) === undefined) {
+            publicRooms.push(key);
+        }
+    });
+    return publicRooms; 
+}
+
+function countRoom(roomName) {
+   return wsServer.sockets.adapter.rooms.get(roomName)?.size;
+}
+
 wsServer.on("connection", socket => {
     // console.log(socket);
     socket["nickname"] = "Anon";
     socket.onAny((event) => {
+        // console.log(wsServer.sockets.adapter); // 메모리에 존재
         console.log(`Socket Events: ${event}`);
     });
 
@@ -36,12 +56,19 @@ wsServer.on("connection", socket => {
         // console.log(socket.rooms);
         socket.join(roomName);
         done();
-        socket.to(roomName).emit("welcome", socket.nickname);
+        socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));
+        wsServer.sockets.emit("room_change", publicRooms());
 
     });
 
+    // 방을 나가기 직전
     socket.on("disconnecting", () => {
-        socket.rooms.forEach((room) => socket.to(room).emit("bye", socket.nickname));
+        socket.rooms.forEach((room) => socket.to(room).emit("bye", socket.nickname, countRoom(room) - 1));
+    });
+
+    // disconnecting 전에 발생 
+    socket.on("disconnect", () => {
+        wsServer.sockets.emit("room_change", publicRooms());
     });
 
     socket.on("new_message", (msg, room, done) => {
